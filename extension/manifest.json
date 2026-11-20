@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "一鍵還原/清除個人服務的登入狀態,登入資料以主密碼加密保存。",
   "minimum_chrome_version": "120",
-  "permissions": ["cookies", "storage", "tabs", "idle", "alarms", "browsingData", "favicon", "tabGroups", "declarativeNetRequestWithHostAccess"],
+  "permissions": ["cookies", "storage", "tabs", "idle", "alarms", "browsingData", "favicon", "tabGroups", "declarativeNetRequestWithHostAccess", "scripting"],
   "host_permissions": [
     "*://*.spotify.com/*",
     "*://*.netflix.com/*",

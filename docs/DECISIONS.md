@@ -1,6 +1,6 @@
 # DECISIONS — 決策索引
 
-只有索引，內容在 `decisions/`。**下一個可用編號：D-0005、R-009**
+只有索引，內容在 `decisions/`。**下一個可用編號：D-0006、R-010**
 
 狀態：✅ 有效 · 📝 提案 · ↪ 已被取代
 
@@ -12,6 +12,7 @@
 | [D-0002](decisions/D-0002-單人專案的協作規則.md) | 只沿用範本的文件規則；Claude 直接 commit 並 push 到 main | ✅ | 使用者 | 2026-11-20 |
 | [D-0003](decisions/D-0003-服務集中在專用視窗的分頁群組.md) | 新增「PersonaHub 視窗」開啟方式：服務集中在專用視窗的分頁群組 | ✅ | 使用者（細節 Claude 擬定） | 2026-11-20 |
 | [D-0004](decisions/D-0004-裝置綁定登入的服務不還原.md) | 受裝置綁定（DBSC）保護的服務（YouTube）不保存、不還原，每次解鎖重新登入 | ✅ | 使用者（細節 Claude 擬定） | 2026-11-21 |
+| [D-0005](decisions/D-0005-localStorage登入的服務保存指定key.md) | 登入存在 localStorage 的服務（Discord）以背景一次性注入保存、還原指定 key | ✅ | 使用者（細節 Claude 擬定） | 2026-11-21 |
 
 ## 否決清單（請勿刪減）
 
@@ -25,3 +26,4 @@
 | R-006 | 入口頁用 iframe 內嵌各服務 | 要拿掉防嵌入標頭；cookie、DRM 不保證能動 | 實測可行且接受風險時（2026-11-21 原型：Spotify、Netflix 可行；YouTube 一般影片框架崩潰） | D-0003 |
 | R-007 | 鎖定時不清除 Google cookie | 鎖定失去意義 | 無 | D-0004 |
 | R-008 | 關閉 Chrome 的 DBSC | 影響整個 Chrome、降低防盜 | 無 | D-0004 |
+| R-009 | 常駐 content script 讀寫 localStorage | 對網頁暴露介面、違反 CLAUDE.md §6 | 無 | D-0005 |

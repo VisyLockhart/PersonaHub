@@ -7,6 +7,7 @@
 // noRestore    true = 不保存、不還原(登入受裝置綁定保護,或登入不在 cookie 裡),鎖定時照樣清除。見 D-0004
 // noRestoreReason 入口頁卡片顯示的原因(noRestore 時)
 // frameCookies 還原時改成 SameSite=None 的非登入 cookie(例如 cookie 政策同意紀錄),內嵌時才讀得到。不可放登入 cookie
+// storage      登入資料存在 localStorage 的服務:{ origin, keys, authKey }。保存、還原這些 key;authKey 存在 = 已登入。見 D-0005
 // embed        [實驗] 可在入口頁內嵌開啟;embedLogin: false = 登入頁不能內嵌,過期時改用一般開啟方式
 
 export const SERVICES = [
@@ -97,9 +98,8 @@ export const SERVICES = [
     domains: ['discord.com'],
     origins: ['https://discord.com'],
     authCookies: [],
-    // 登入 token 存在 localStorage 不在 cookie,只還原 cookie 不會登入;鎖定時照樣清除站台資料
-    noRestore: true,
-    noRestoreReason: '登入資料不在 cookie',
+    // 登入 token 存在 localStorage 不在 cookie。見 D-0005
+    storage: { origin: 'https://discord.com', keys: ['token'], authKey: 'token' },
     embed: true,
   },
 ];

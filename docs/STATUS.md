@@ -40,6 +40,7 @@
 | 服務卡片 `_favicon` 圖示、主題切換、設定頁「返回」修正 | 入口頁實際操作 |
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
+| Discord localStorage 還原（D-0005）：一般分頁登入→鎖定→解鎖點卡片是否已登入；內嵌登入後同流程 | 先用一般分頁測，再測內嵌 |
 | Claude 改為不還原後：鎖定→解鎖點卡片會開登入頁（一般分頁） | 鎖定→解鎖點卡片 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
 | 捷徑釘選到工作列後，入口頁 App 視窗是否獨立一顆、顯示 PersonaHub 圖示 | 釘選後觀察 |
@@ -57,7 +58,7 @@
 
 | # | 項目 | 備註 |
 |---|---|---|
-| O-1 | 新增 Claude、Discord 服務入口，支援內嵌分頁 | 已實作，部分驗收。Claude 受 DBSC 綁定，不還原；內嵌無側欄，是否保留內嵌待使用者決定；Discord 登入 token 在 localStorage，目前不還原、每次解鎖重新登入（要還原需另立決策加 localStorage 保存） |
+| O-1 | 新增 Claude、Discord 服務入口，支援內嵌分頁 | 已實作，部分驗收。Claude 受 DBSC 綁定，不還原；內嵌無側欄，是否保留內嵌待使用者決定；Discord 改以 localStorage 還原（D-0005），未驗收 |
 | O-2 | 內嵌改為每張服務卡片各自的開關，未開啟的服務照設定頁的開啟方式 | 取代設定頁的全域內嵌開關；開關狀態不是機密，可存 `chrome.storage.local` |
 
 1. **內嵌原型**：Spotify、Netflix 可行，觀察穩定性後決定是否立新決策對個別服務推翻 R-006（實測紀錄在 D-0003）。YouTube 不內嵌（框架內一般影片崩潰）；框架內登入靠 cookie 變動即時保存

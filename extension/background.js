@@ -136,6 +136,70 @@ async function closeServiceTabs() {
   if (tabs.length) await chrome.tabs.remove(tabs.map((t) => t.id));
 }
 
+// ---------- localStorage(D-0005)----------
+// 只在本外掛主動注入時讀寫,不留常駐 content script、不對網頁開放任何介面。
+// 讀:從已開啟的服務分頁(或入口頁內嵌框架)讀;沒有開著就回 null,不覆蓋舊快照。
+// 寫:開一個背景分頁到該來源的 robots.txt(不執行網站程式),寫入後關閉。
+
+function pickStorage(keys) {
+  const out = {};
+  for (const k of keys) {
+    const v = localStorage.getItem(k);
+    if (v != null) out[k] = v;
+  }
+  return out;
+}
+
+async function readStorage(svc) {
+  const { origin, keys } = svc.storage;
+  const targets = (await chrome.tabs.query({ url: `${origin}/*` })).map((t) => ({ tabId: t.id }));
+  const { embedTabs = [] } = await chrome.storage.session.get('embedTabs');
+  for (const tabId of embedTabs) targets.push({ tabId, allFrames: true });
+  for (const target of targets) {
+    try {
+      const results = await chrome.scripting.executeScript({ target, func: pickStorage, args: [keys] });
+      for (const r of results) {
+        if (r.documentId && r.result && Object.keys(r.result).length) return r.result;
+      }
+      // 分頁開著但沒有 key = 已登出
+      if (!target.allFrames) return {};
+    } catch {
+      // 框架不是該來源或已關閉,換下一個
+    }
+  }
+  return null;
+}
+
+function waitTabComplete(tabId) {
+  return new Promise((resolve) => {
+    const done = (id, info) => {
+      if (id === tabId && info.status === 'complete') {
+        chrome.tabs.onUpdated.removeListener(done);
+        resolve();
+      }
+    };
+    chrome.tabs.onUpdated.addListener(done);
+    setTimeout(() => {
+      chrome.tabs.onUpdated.removeListener(done);
+      resolve();
+    }, 10000);
+  });
+}
+
+function putStorage(items) {
+  for (const [k, v] of Object.entries(items)) localStorage.setItem(k, v);
+}
+
+async function writeStorage(svc, items) {
+  const tab = await chrome.tabs.create({ url: `${svc.storage.origin}/robots.txt`, active: false });
+  try {
+    await waitTabComplete(tab.id);
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, func: putStorage, args: [items] });
+  } finally {
+    await chrome.tabs.remove(tab.id).catch(() => {});
+  }
+}
+
 // ---------- 保存 ----------
 
 // 已確認登入 cookie 的服務:目前沒登入就不覆蓋舊快照,避免把「已登出」存進去
@@ -147,6 +211,13 @@ async function captureInto(data, svc) {
     return true;
   }
   const cookies = await readCookies(svc);
+  if (svc.storage) {
+    const storage = await readStorage(svc);
+    // 讀不到(沒開著)或已登出:保留舊快照
+    if (!storage?.[svc.storage.authKey]) return false;
+    data.services[svc.id] = { cookies, storage, savedAt: Date.now(), hasAuth: true };
+    return true;
+  }
   const auth = hasAuthCookie(svc, cookies);
   if (auth === false || cookies.length === 0) return false;
   data.services[svc.id] = { cookies, savedAt: Date.now(), hasAuth: auth };
@@ -181,7 +252,7 @@ async function status() {
       embed: !!svc.embed,
       noRestore: !!svc.noRestore,
       noRestoreReason: svc.noRestoreReason || '',
-      authKnown: svc.authCookies.length > 0,
+      authKnown: svc.authCookies.length > 0 || !!svc.storage,
       savedAt: snap?.savedAt ?? null,
       hasAuth: snap?.hasAuth ?? null,
     });
@@ -233,8 +304,9 @@ async function openService({ id }, sender) {
   const data = await loadData(await getKey());
   const snap = svc.noRestore ? null : data.services[id];
   if (snap) await restoreCookies(snap.cookies, svc.frameCookies);
+  if (snap?.storage) await writeStorage(svc, snap.storage);
 
-  const auth = hasAuthCookie(svc, await readCookies(svc));
+  const auth = svc.storage ? !!snap?.storage : hasAuthCookie(svc, await readCookies(svc));
   const needsLogin = auth === false;
   const url = needsLogin ? svc.loginUrl : svc.url;
 
