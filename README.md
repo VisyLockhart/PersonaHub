@@ -18,7 +18,9 @@
 
 ## 桌面捷徑（Windows）
 
-入口頁「設定」→「複製建立桌面捷徑的指令」，貼到 PowerShell 按 Enter，桌面會出現 PersonaHub 捷徑：使用 PersonaHub 圖示、直接用裝了外掛的設定檔開啟解鎖畫面。右鍵捷徑可釘選到工作列。腳本在 `extension/shortcut/create-shortcut.ps1`，也可以直接執行：`powershell -ExecutionPolicy Bypass -File extension/shortcut/create-shortcut.ps1 <外掛 ID>`。
+入口頁「設定」→「複製建立桌面捷徑的指令」，貼到 PowerShell 按 Enter，桌面會出現 PersonaHub 捷徑：使用 PersonaHub 圖示、直接用裝了外掛的設定檔開啟解鎖畫面。右鍵捷徑可釘選到工作列。
+
+也可以不開入口頁：雙擊 `extension/shortcut/create-shortcut.cmd`（或在 cmd 執行它），會依外掛資料夾自動找出外掛與設定檔。PowerShell 版本：`powershell -ExecutionPolicy Bypass -File extension/shortcut/create-shortcut.ps1 [外掛 ID]`。
 
 ## 使用
 

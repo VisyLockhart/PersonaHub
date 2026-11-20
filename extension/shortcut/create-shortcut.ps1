@@ -2,7 +2,8 @@
 #
 # 用法：
 #   1. 入口頁「設定」→「複製建立捷徑的指令」，貼到 PowerShell 執行（外掛 ID 已自動帶入）
-#   2. 或直接執行：powershell -ExecutionPolicy Bypass -File create-shortcut.ps1 <外掛 ID>
+#   2. 或雙擊同資料夾的 create-shortcut.cmd（自動依外掛資料夾找出外掛）
+#   3. 或執行：powershell -ExecutionPolicy Bypass -File create-shortcut.ps1 [外掛 ID]
 #
 # 做的事：
 #   - 找出裝了 PersonaHub 的 Chrome 設定檔與外掛資料夾
@@ -11,7 +12,10 @@
 # 不會修改 Chrome 設定，也不會讀取或輸出任何 cookie、Vault 內容。
 
 if (-not $ExtensionId) { $ExtensionId = $args[0] }
-if (-not $ExtensionId) { Write-Host '缺少外掛 ID（chrome://extensions 可查）' -ForegroundColor Red; return }
+# 沒給 ID 時（例如雙擊 create-shortcut.cmd），改用腳本所在的外掛資料夾去比對
+$extRoot = $null
+if (-not $ExtensionId -and $PSScriptRoot) { $extRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path.TrimEnd('\') }
+if (-not $ExtensionId -and -not $extRoot) { Write-Host '缺少外掛 ID（chrome://extensions 可查）' -ForegroundColor Red; return }
 
 $userData = Join-Path $env:LOCALAPPDATA 'Google\Chrome\User Data'
 $profileDir = $null
@@ -21,20 +25,29 @@ foreach ($dir in Get-ChildItem $userData -Directory -ErrorAction SilentlyContinu
     $file = Join-Path $dir.FullName $name
     if (-not (Test-Path $file)) { continue }
     $text = [IO.File]::ReadAllText($file)
-    if (-not $text.Contains($ExtensionId)) { continue }
+    if ($ExtensionId -and -not $text.Contains($ExtensionId)) { continue }
     try {
-      $ext = (ConvertFrom-Json $text).extensions.settings.$ExtensionId
-      if ($ext) {
+      $settings = (ConvertFrom-Json $text).extensions.settings
+      if (-not $settings) { continue }
+      foreach ($prop in $settings.PSObject.Properties) {
+        $path = $prop.Value.path
+        $match = if ($ExtensionId) { $prop.Name -eq $ExtensionId } else { $path -and ($path.TrimEnd('\') -ieq $extRoot) }
+        if (-not $match) { continue }
+        $ExtensionId = $prop.Name
         $profileDir = $dir.Name
-        if ($ext.path -and (Test-Path (Join-Path $ext.path 'manifest.json'))) { $extPath = $ext.path }
+        if ($path -and (Test-Path (Join-Path $path 'manifest.json'))) { $extPath = $path }
+        break
       }
     } catch { }
     if ($profileDir) { break }
   }
   if ($profileDir) { break }
 }
-if (-not $profileDir) { Write-Host "找不到裝了外掛 $ExtensionId 的 Chrome 設定檔" -ForegroundColor Red; return }
-
+if (-not $profileDir) {
+  $what = if ($ExtensionId) { "外掛 $ExtensionId" } else { "資料夾 $extRoot 的外掛" }
+  Write-Host "找不到裝了$what 的 Chrome 設定檔" -ForegroundColor Red
+  return
+}
 $chrome = @(
   (Join-Path $env:ProgramFiles 'Google\Chrome\Application\chrome.exe'),
   (Join-Path ${env:ProgramFiles(x86)} 'Google\Chrome\Application\chrome.exe'),

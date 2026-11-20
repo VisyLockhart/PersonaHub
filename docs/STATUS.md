@@ -21,6 +21,8 @@
 
 - 「PersonaHub 視窗」開啟方式（D-0003）：服務集中在同一視窗的分頁群組
 
+- 桌面捷徑（PowerShell 版）：建立成功、圖示正常
+
 **尚未驗證：**
 
 | 項目 | 怎麼驗 |
@@ -28,7 +30,6 @@
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
-| 桌面捷徑：設定頁複製指令→PowerShell 執行→捷徑用 PersonaHub 圖示開啟解鎖畫面；釘選到工作列後的圖示與合併方式 | 依 README「桌面捷徑」 |
 
 ## 3. 未決問題
 
