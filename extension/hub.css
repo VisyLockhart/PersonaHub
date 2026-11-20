@@ -280,6 +280,9 @@ input[type="password"] { font-family: var(--font-display); letter-spacing: .12em
 }
 .seg-track:has(input[value="tab"]:checked) .seg-thumb { transform: translateX(100%); }
 .seg-track:has(input[value="window"]:checked) .seg-thumb { transform: translateX(200%); }
+.seg-track.seg-4 { grid-template-columns: repeat(4, 1fr); }
+.seg-4 .seg-thumb { width: calc((100% - 8px) / 4); }
+.seg-track:has(input[value="split"]:checked) .seg-thumb { transform: translateX(300%); }
 
 /* ---------- 按鈕 ---------- */
 button {

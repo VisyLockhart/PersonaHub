@@ -13,6 +13,7 @@
 | 外掛圖示 | 已驗收 | — | 方案 A：裁切 Logo 中央徽記；完整原圖 `icons/logo-full.png` 放在設定頁底部，也供上架使用 |
 | 開啟方式 | 已 push，部分驗收 | — | 新分頁／獨立視窗（App 視窗）／PersonaHub 視窗（分頁群組，D-0003） |
 | 內嵌分頁原型（實驗） | 已 push，未驗收 | — | 設定頁開關；Spotify、Netflix 在入口頁分頁列（YouTube 已改回不內嵌）＋iframe 開啟；DNR session rule 只對入口頁所在分頁的子框架移除 `X-Frame-Options`、CSP |
+| 分割畫面原型（實驗） | 已 push，未驗收 | — | 設定頁開啟方式「分割畫面」：入口頁在左、服務分頁在右（`tabs.create({splitWithTabId})`，Chrome 155+）；已分割時換掉右邊；失敗退回新分頁。目標是取代 iframe 內嵌（使用者 2026-11-21 提出左側選單＋右側服務畫面） |
 | 桌面捷徑腳本 `extension/shortcut/` | 已 push，部分驗收 | — | 設定頁複製 PowerShell 指令，或雙擊 `create-shortcut.cmd`；捷徑以 App 視窗開啟入口頁、用 PersonaHub 圖示 |
 
 ## 2. 驗證
@@ -41,6 +42,7 @@
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
 | Discord localStorage 還原（D-0005）：一般分頁登入→鎖定→解鎖點卡片是否已登入；內嵌登入後同流程 | 先用一般分頁測，再測內嵌 |
+| 分割畫面原型：一般視窗開入口頁、關掉內嵌開關，點 Claude、YouTube 是否在右邊並排；再點別的服務是否換掉右邊；入口頁縮窄後的樣子；App 視窗（popup）中是否退回新分頁 | 設定頁選「分割畫面」後逐一點卡片 |
 | Claude 改為不還原後：鎖定→解鎖點卡片會開登入頁（一般分頁） | 鎖定→解鎖點卡片 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
 | 捷徑釘選到工作列後，入口頁 App 視窗是否獨立一顆、顯示 PersonaHub 圖示 | 釘選後觀察 |

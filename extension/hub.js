@@ -172,7 +172,7 @@ function renderGrid(services) {
       busy(open, async () => {
         const r = await send('open', { id: s.id });
         if (r.embed) openFrame(s, r.embed.url);
-        say(r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(${s.noRestoreReason || '無法還原'})。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
+        say(r.notice ? r.notice : r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(${s.noRestoreReason || '無法還原'})。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
       }),
     );
     if (s.savedAt) {

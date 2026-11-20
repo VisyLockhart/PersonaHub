@@ -316,6 +316,10 @@ async function openService({ id }, sender) {
     await allowEmbedIn(sender.tab.id);
     return { needsLogin, embed: { url } };
   }
+  if (openMode === 'split' && sender?.tab?.id != null) {
+    const r = await openInSplit(sender.tab, url);
+    if (r) return { needsLogin, ...r };
+  }
   if (openMode === 'group') {
     await openInGroupWindow(svc, url);
   } else if (openMode === 'window') {
@@ -324,6 +328,31 @@ async function openService({ id }, sender) {
     await chrome.tabs.create({ url });
   }
   return { needsLogin };
+}
+
+// [實驗] 分割畫面(Chrome 155+):入口頁在左,服務分頁在右。
+// 入口頁已在分割中就把右邊換成這個服務;API 不存在或視窗不支援(例如 popup)就退回新分頁。
+async function openInSplit(hubTab, url) {
+  if (typeof chrome.tabs.createSplit !== 'function') {
+    await chrome.tabs.create({ url });
+    return { notice: '這個 Chrome 版本不支援分割畫面 API,已改用新分頁開啟。' };
+  }
+  try {
+    const hub = await chrome.tabs.get(hubTab.id);
+    if (hub.splitViewId != null && hub.splitViewId !== chrome.tabs.SPLIT_VIEW_ID_NONE) {
+      const [other] = (await chrome.tabs.query({ splitViewId: hub.splitViewId })).filter((t) => t.id !== hub.id);
+      if (other) {
+        await chrome.tabs.update(other.id, { url, active: true });
+        return { split: true };
+      }
+    }
+    await chrome.tabs.create({ url, splitWithTabId: hub.id, active: true });
+    return { split: true };
+  } catch (e) {
+    console.warn('分割畫面失敗', e);
+    await chrome.tabs.create({ url });
+    return { notice: `分割畫面失敗(${e.message}),已改用新分頁開啟。` };
+  }
 }
 
 // PersonaHub 專用視窗:所有服務開在同一個一般視窗,收進名為 PersonaHub 的分頁群組。
