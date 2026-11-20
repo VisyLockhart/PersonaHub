@@ -12,6 +12,7 @@
 | 服務圖示用 Chrome `_favicon` API（`favicon` 權限），不打包品牌 Logo、不向外取圖；載入失敗退回服務名首字 | 公開 repo 不放商標檔；不送資料出本機 | 2026-11-20 入口頁改版 |
 | cookie 新增／覆寫時延遲保存，刪除事件不觸發保存 | 服務會輪替登入 cookie，快照停在舊值會還原失敗；鎖定、清除的刪除不能存進快照 | 2026-11-21 YouTube 還原後被登出 |
 | 新增服務前先看 DevTools → Application → Device bound sessions；有工作階段就設 `noRestore` | 裝置綁定的 cookie 寫回後會被作廢 | D-0004 |
+| 內嵌需要的非登入 cookie 列在 `frameCookies`，還原時設 SameSite=None；登入 cookie 不可放寬 | 內嵌框架是第三方情境，Lax cookie 讀寫不到；放寬登入 cookie 會削弱 CSRF 防護 | 2026-11-21 Spotify 內嵌橫幅 |
 | 新增服務要同時改 `services.js` 和 `manifest.json` 的 `host_permissions` | 沒有權限時 `chrome.cookies` 讀不到該網域 | D-0001 |
 
 ## 2. 測試

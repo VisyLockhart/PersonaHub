@@ -5,6 +5,7 @@
 // authCookies  代表「已登入」的 cookie 名稱;空陣列 = 尚未確認,不做登入判斷
 // loginUrl     登入過期時開啟的官方登入頁
 // noRestore    true = 不保存、不還原(登入受裝置綁定保護,寫回的 cookie 會被作廢),鎖定時照樣清除。見 D-0004
+// frameCookies 還原時改成 SameSite=None 的非登入 cookie(例如 cookie 政策同意紀錄),內嵌時才讀得到。不可放登入 cookie
 // embed        [實驗] 可在入口頁內嵌開啟;embedLogin: false = 登入頁不能內嵌,過期時改用一般開啟方式
 
 export const SERVICES = [
@@ -18,6 +19,7 @@ export const SERVICES = [
     origins: ['https://open.spotify.com', 'https://accounts.spotify.com', 'https://www.spotify.com'],
     authCookies: ['sp_dc'],
     embed: true,
+    frameCookies: ['OptanonAlertBoxClosed', 'OptanonConsent'],
   },
   {
     id: 'netflix',

@@ -83,7 +83,7 @@ function hasAuthCookie(svc, cookies) {
   return cookies.some((c) => svc.authCookies.includes(c.name));
 }
 
-async function restoreCookies(cookies) {
+async function restoreCookies(cookies, frameCookies = []) {
   const now = Date.now() / 1000;
   let ok = 0;
   for (const c of cookies) {
@@ -98,6 +98,8 @@ async function restoreCookies(cookies) {
     };
     if (!c.hostOnly) d.domain = c.domain;
     if (c.sameSite && c.sameSite !== 'unspecified') d.sameSite = c.sameSite;
+    // 內嵌框架是第三方情境,網站自己寫的 Lax cookie 讀寫不到;同意紀錄這類非登入 cookie 放寬
+    if (frameCookies.includes(c.name)) Object.assign(d, { sameSite: 'no_restriction', secure: true });
     if (!c.session && c.expirationDate) d.expirationDate = c.expirationDate;
     if (c.partitionKey) d.partitionKey = c.partitionKey;
     try {
@@ -228,7 +230,7 @@ async function openService({ id }, sender) {
   if (!svc) throw new Error('未知的服務');
   const data = await loadData(await getKey());
   const snap = svc.noRestore ? null : data.services[id];
-  if (snap) await restoreCookies(snap.cookies);
+  if (snap) await restoreCookies(snap.cookies, svc.frameCookies);
 
   const auth = hasAuthCookie(svc, await readCookies(svc));
   const needsLogin = auth === false;
