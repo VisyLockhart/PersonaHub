@@ -1,4 +1,9 @@
+import { serviceForUrl } from './services.js';
+
 const $ = (sel) => document.querySelector(sel);
+// 在 Chrome 側邊欄裡開啟(原型)
+const inPanel = new URLSearchParams(location.search).has('panel');
+document.documentElement.classList.toggle('in-panel', inPanel);
 const views = ['setup', 'unlock', 'hub', 'settings'];
 let current = null;
 let shown = null;
@@ -171,7 +176,7 @@ function renderGrid(services) {
     open.setAttribute('aria-label', `開啟 ${s.name}(${st.text})`);
     open.addEventListener('click', () =>
       busy(open, async () => {
-        const r = await send('open', { id: s.id });
+        const r = await send('open', { id: s.id, panel: inPanel });
         if (r.embed) openFrame(s, r.embed.url);
         if (r.split) for (const c of grid.querySelectorAll('.svc')) c.classList.toggle('active', c === card);
         say(r.notice ? r.notice : r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(${s.noRestoreReason || '無法還原'})。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
@@ -317,3 +322,17 @@ document.addEventListener('visibilitychange', () => {
 });
 
 refresh().catch((e) => say(e.message, true));
+
+// 側邊欄:標示主畫面目前顯示的服務
+async function markActiveTab() {
+  if (!inPanel) return;
+  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+  const svc = tab && serviceForUrl(tab.url || tab.pendingUrl || '');
+  for (const c of document.querySelectorAll('#grid .svc')) c.classList.toggle('active', c.dataset.id === svc?.id);
+}
+if (inPanel) {
+  chrome.tabs.onActivated.addListener(markActiveTab);
+  chrome.tabs.onUpdated.addListener((_id, info) => { if (info.url) markActiveTab(); });
+  chrome.windows.onFocusChanged.addListener(markActiveTab);
+  new MutationObserver(markActiveTab).observe($('#grid'), { childList: true });
+}

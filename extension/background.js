@@ -297,7 +297,7 @@ async function lock() {
   await updateBadge();
 }
 
-async function openService({ id }, sender) {
+async function openService({ id, panel }, sender) {
   await requireKey();
   const svc = serviceById(id);
   if (!svc) throw new Error('未知的服務');
@@ -309,6 +309,9 @@ async function openService({ id }, sender) {
   const auth = svc.storage ? !!snap?.storage : hasAuthCookie(svc, await readCookies(svc));
   const needsLogin = auth === false;
   const url = needsLogin ? svc.loginUrl : svc.url;
+
+  // 側邊欄(原型):入口頁在側邊欄,服務開在主畫面的一般分頁
+  if (panel) return { needsLogin, ...(await openFromPanel(svc, url, needsLogin)) };
 
   const { openMode, embed } = await getSettings();
   // 實驗:在入口頁內嵌開啟。Google 登入頁不允許在框架內登入,登入過期時退回一般開啟方式
@@ -328,6 +331,24 @@ async function openService({ id }, sender) {
     await chrome.tabs.create({ url });
   }
   return { needsLogin };
+}
+
+// 側邊欄:在最後聚焦的一般視窗裡,已開著的服務分頁就切過去(登入過期才改導到登入頁),
+// 沒有就開新分頁;目前分頁是新分頁頁面時直接取代,不多留空白分頁。
+async function openFromPanel(svc, url, needsLogin) {
+  const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'], populate: true });
+  const existing = win.tabs.find((t) => serviceForUrl(t.url || t.pendingUrl || '') === svc);
+  if (existing) {
+    await chrome.tabs.update(existing.id, needsLogin ? { active: true, url } : { active: true });
+    return { panel: true };
+  }
+  const active = win.tabs.find((t) => t.active);
+  if (active && /^chrome:\/\/(newtab|new-tab-page)\//.test(active.url || active.pendingUrl || '')) {
+    await chrome.tabs.update(active.id, { url });
+  } else {
+    await chrome.tabs.create({ windowId: win.id, url, active: true });
+  }
+  return { panel: true };
 }
 
 // [實驗] 分割畫面(Chrome 155+):入口頁在左,服務分頁在右。
@@ -510,12 +531,19 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true;
 });
 
-chrome.action.onClicked.addListener(async () => {
+// 工具列按鈕:開啟側邊欄;視窗不支援側邊欄(例如 popup)時退回入口頁分頁
+chrome.action.onClicked.addListener(async (tab) => {
+  try {
+    await chrome.sidePanel.open({ windowId: tab.windowId });
+    return;
+  } catch (e) {
+    console.warn('側邊欄開啟失敗,改開入口頁', e);
+  }
   const url = chrome.runtime.getURL('hub.html');
-  const [tab] = await chrome.tabs.query({ url });
-  if (tab) {
-    await chrome.tabs.update(tab.id, { active: true });
-    await chrome.windows.update(tab.windowId, { focused: true });
+  const [hubTab] = await chrome.tabs.query({ url });
+  if (hubTab) {
+    await chrome.tabs.update(hubTab.id, { active: true });
+    await chrome.windows.update(hubTab.windowId, { focused: true });
   } else {
     await chrome.tabs.create({ url });
   }
