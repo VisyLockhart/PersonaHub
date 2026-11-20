@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PersonaHub</title>
+  <link rel="stylesheet" href="hub.css">
+</head>
+<body>
+  <header>
+    <h1>PersonaHub</h1>
+    <div id="toolbar" hidden>
+      <button id="btn-save" class="ghost">立即保存</button>
+      <button id="btn-settings" class="ghost">設定</button>
+      <button id="btn-lock" class="danger">鎖定並登出</button>
+    </div>
+  </header>
+
+  <main>
+    <p id="msg" role="status"></p>
+
+    <form id="view-setup" class="card narrow" hidden>
+      <h2>建立 Vault</h2>
+      <p class="hint">主密碼用來加密你的登入資料,<strong>忘記就無法復原</strong>,只能重設並重新登入各服務。</p>
+      <label>主密碼(至少 12 字元)<input type="password" name="password" autocomplete="new-password" required minlength="12"></label>
+      <label>再輸入一次<input type="password" name="confirm" autocomplete="new-password" required minlength="12"></label>
+      <button type="submit">建立並解鎖</button>
+    </form>
+
+    <form id="view-unlock" class="card narrow" hidden>
+      <h2>解鎖</h2>
+      <label>主密碼<input type="password" name="password" autocomplete="current-password" required autofocus></label>
+      <button type="submit">解鎖</button>
+      <button type="button" id="btn-reset" class="link">忘記主密碼?重設 Vault</button>
+    </form>
+
+    <section id="view-hub" hidden>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <form id="view-settings" class="card narrow" hidden>
+      <h2>設定</h2>
+      <label>閒置多久自動鎖定(分鐘,0 = 不自動鎖定)<input type="number" name="idleMinutes" min="0" max="240"></label>
+      <label class="row"><input type="checkbox" name="lockOnScreenLock"> Windows 鎖定畫面(Win+L)時一併鎖定</label>
+      <label>開啟服務的方式
+        <select name="openMode">
+          <option value="tab">新分頁(可用 Bitwarden 等外掛)</option>
+          <option value="window">獨立視窗(像 App,但沒有外掛列)</option>
+        </select>
+      </label>
+      <div class="row">
+        <button type="submit">儲存</button>
+        <button type="button" id="btn-settings-close" class="ghost">返回</button>
+      </div>
+      <p class="hint">快捷鍵 Alt+Shift+L 可隨時鎖定(可在 chrome://extensions/shortcuts 修改)。</p>
+    </form>
+  </main>
+
+  <script type="module" src="hub.js"></script>
+</body>
+</html>

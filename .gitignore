@@ -1,0 +1,22 @@
+# 機密:不進 git
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crx
+
+# Claude Code 個人本機設定
+.claude/settings.local.json
+CLAUDE.local.md
+
+# 作業系統與編輯器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# 記錄與暫存
+*.log
+tmp/

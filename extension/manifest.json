@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "PersonaHub",
+  "version": "0.1.0",
+  "description": "一鍵還原/清除個人服務的登入狀態,登入資料以主密碼加密保存。",
+  "minimum_chrome_version": "120",
+  "permissions": ["cookies", "storage", "tabs", "idle", "alarms", "browsingData"],
+  "host_permissions": [
+    "*://*.spotify.com/*",
+    "*://*.netflix.com/*",
+    "*://*.youtube.com/*",
+    "*://*.google.com/*",
+    "*://*.google.com.tw/*",
+    "*://*.ubereats.com/*",
+    "*://*.uber.com/*",
+    "*://*.friday.tw/*",
+    "*://*.fetnet.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "PersonaHub"
+  },
+  "commands": {
+    "lock-now": {
+      "suggested_key": { "default": "Alt+Shift+L" },
+      "description": "立即鎖定並登出所有個人服務"
+    }
+  },
+  "incognito": "not_allowed"
+}
