@@ -163,6 +163,16 @@ main { max-width: 1040px; margin: 0 auto; padding: 24px 24px 64px; }
 }
 #view-settings.narrow { margin-top: 0; max-width: 540px; }
 
+/* 設定頁底部：完整原圖 */
+.about {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.about img { flex: none; border-radius: 50%; }
+
 h2 { margin: 0; font: 600 26px/1.2 var(--font-display); }
 .hint { color: var(--muted); font-size: 13px; margin: 0; }
 .hint strong { color: var(--ink); }
