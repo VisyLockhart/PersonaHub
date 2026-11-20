@@ -140,6 +140,9 @@ async function closeServiceTabs() {
     const all = await chrome.tabs.query({ windowId });
     if (all.every((t) => closing.has(t.id))) await chrome.tabs.create({ windowId, active: true });
   }
+  // 先解散群組再關:直接關掉群組的最後一個分頁,Chrome 會把群組「儲存」並釘到書籤列,每次鎖定多一個
+  const grouped = tabs.filter((t) => t.groupId !== chrome.tabGroups.TAB_GROUP_ID_NONE).map((t) => t.id);
+  if (grouped.length) await chrome.tabs.ungroup(grouped).catch((e) => console.warn('解散群組失敗', e));
   await chrome.tabs.remove([...closing]);
 }
 
