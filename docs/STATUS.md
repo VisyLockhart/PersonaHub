@@ -12,14 +12,15 @@
 | 入口頁 UI | 已 push，部分驗收 | — | Logo 配色（鐵灰藍＋金屬灰＋黃銅金）、服務卡片側欄用 `_favicon` 服務圖示、動效、主題切換（系統／淺色／深色） |
 | 外掛圖示 | 已驗收 | — | 方案 A：裁切 Logo 中央徽記；完整原圖 `icons/logo-full.png` 放在設定頁底部，也供上架使用 |
 | 開啟方式 | 已 push，部分驗收 | — | 新分頁／獨立視窗（App 視窗）／PersonaHub 視窗（分頁群組，D-0003） |
-| 內嵌分頁原型（實驗） | 已 push，未驗收 | — | 設定頁開關；Spotify、YouTube 在入口頁分頁列＋iframe 開啟；DNR session rule 只對入口頁所在分頁的子框架移除 `X-Frame-Options`、CSP |
+| 內嵌分頁原型（實驗） | 已 push，未驗收 | — | 設定頁開關；Spotify、YouTube、Netflix 在入口頁分頁列＋iframe 開啟；DNR session rule 只對入口頁所在分頁的子框架移除 `X-Frame-Options`、CSP |
 | 桌面捷徑腳本 `extension/shortcut/` | 已 push，部分驗收 | — | 設定頁複製 PowerShell 指令，或雙擊 `create-shortcut.cmd`；捷徑以 App 視窗開啟入口頁、用 PersonaHub 圖示 |
 
 ## 2. 驗證
 
 使用者在獨立的本機 Chrome 設定檔「PersonaHub 測試」（`Profile 1`，不登入 Google）載入外掛測試。
 
-**已驗證（2026-11-20，使用者實測）：**
+**已驗證（2026-11-20～21，使用者實測）：**
+- 內嵌原型：Spotify 能內嵌並播放；YouTube 登入後能內嵌顯示
 - 建立主密碼、解鎖、入口頁顯示
 - Spotify：登入後自動保存、鎖定後登出、Win+L 觸發鎖定並登出
 - 外掛圖示、設定頁（含底部原圖）
@@ -31,7 +32,7 @@
 
 | 項目 | 怎麼驗 |
 |---|---|
-| 內嵌原型：Spotify、YouTube 能否顯示、是否保持登入、能否播放（含全螢幕） | 設定頁開「實驗：內嵌開啟」→ 儲存 → 點卡片 |
+| 內嵌原型：YouTube 播放時出現框架被擋畫面（原因待查，非 AdGuard）；Netflix 能否內嵌 | 入口頁 F12 看 Console／Network 的錯誤碼 |
 | 服務卡片 `_favicon` 圖示、主題切換、設定頁「返回」修正 | 入口頁實際操作 |
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |

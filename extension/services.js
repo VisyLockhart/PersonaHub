@@ -27,6 +27,7 @@ export const SERVICES = [
     domains: ['netflix.com'],
     origins: ['https://www.netflix.com'],
     authCookies: ['NetflixId'],
+    embed: true,
   },
   {
     id: 'youtube',
