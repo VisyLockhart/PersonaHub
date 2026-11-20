@@ -130,10 +130,17 @@ async function wipeService(svc) {
   );
 }
 
+// 視窗裡只剩服務分頁時,先補一個新分頁再關,避免視窗(連同側邊欄)甚至整個瀏覽器被關掉
 async function closeServiceTabs() {
   const patterns = SERVICES.flatMap((s) => s.domains.map((d) => `*://*.${d}/*`));
   const tabs = await chrome.tabs.query({ url: patterns });
-  if (tabs.length) await chrome.tabs.remove(tabs.map((t) => t.id));
+  if (!tabs.length) return;
+  const closing = new Set(tabs.map((t) => t.id));
+  for (const windowId of new Set(tabs.map((t) => t.windowId))) {
+    const all = await chrome.tabs.query({ windowId });
+    if (all.every((t) => closing.has(t.id))) await chrome.tabs.create({ windowId, active: true });
+  }
+  await chrome.tabs.remove([...closing]);
 }
 
 // ---------- localStorage(D-0005)----------
