@@ -25,8 +25,26 @@
   --ease-out: cubic-bezier(.2, .8, .2, 1);
   color-scheme: light dark;
 }
+/* 深色：主題設為「深色」，或「跟隨系統」且系統是深色 */
+:root[data-theme="dark"] {
+  --bg: #131a26;
+  --surface: #1c2636;
+  --surface-2: #232f42;
+  --ink: #dfe3e8;
+  --muted: #8e99aa;
+  --line: #34435b;
+  --steel: #6f88ab;
+  --gold: #c6a663;
+  --gold-ink: #1a1408;
+  --danger: #ec8a82;
+  --ok: #78c795;
+  --warn: #e9b062;
+  --rivet: #d9dde3;
+  --focus: #c6a663;
+  color-scheme: dark;
+}
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #131a26;
     --surface: #1c2636;
     --surface-2: #232f42;
@@ -41,8 +59,10 @@
     --warn: #e9b062;
     --rivet: #d9dde3;
     --focus: #c6a663;
+    color-scheme: dark;
   }
 }
+:root[data-theme="light"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -81,6 +101,37 @@ h1 img { border-radius: 50%; box-shadow: 0 0 0 1px var(--line), 0 4px 12px -4px 
 h1 b { font-weight: inherit; }
 h1 span { color: var(--gold); }
 #toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.header-end { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+/* 主題切換：三段，滑塊跟著選項移動 */
+.theme {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  min-width: 0;
+}
+.theme legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.theme label { position: relative; z-index: 1; cursor: pointer; }
+.theme input { position: absolute; opacity: 0; }
+.theme span {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 5px;
+  color: var(--muted);
+  font: 600 13px/1 var(--font-display);
+  text-align: center;
+  transition: color .2s;
+}
+.theme input:checked + span { color: var(--ink); }
+.theme input:focus-visible + span { outline: 2px solid var(--focus); }
+.theme .seg-thumb { top: 3px; bottom: 3px; left: 3px; width: calc((100% - 6px) / 3); }
+.theme:has(input[value="light"]:checked) .seg-thumb { transform: translateX(100%); }
+.theme:has(input[value="dark"]:checked) .seg-thumb { transform: translateX(200%); }
 
 main { max-width: 1040px; margin: 0 auto; padding: 24px 24px 64px; }
 

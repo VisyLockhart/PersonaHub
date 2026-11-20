@@ -3,6 +3,28 @@ const views = ['setup', 'unlock', 'hub', 'settings'];
 let current = null;
 let shown = null;
 
+// 主題:system / light / dark。不是機密,存在 chrome.storage.local。
+// 另存一份在 localStorage,頁面載入時可以同步套用,減少閃爍。
+function applyTheme(theme) {
+  if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+  else delete document.documentElement.dataset.theme;
+  const radio = document.querySelector(`#theme input[value="${theme}"]`) ?? document.querySelector('#theme input[value="system"]');
+  radio.checked = true;
+}
+applyTheme(localStorage.getItem('theme') || 'system');
+chrome.storage.local.get('theme').then(({ theme }) => {
+  if (theme) {
+    applyTheme(theme);
+    localStorage.setItem('theme', theme);
+  }
+});
+document.querySelector('#theme').addEventListener('change', (e) => {
+  const theme = e.target.value;
+  applyTheme(theme);
+  localStorage.setItem('theme', theme);
+  chrome.storage.local.set({ theme });
+});
+
 async function send(type, payload = {}) {
   const res = await chrome.runtime.sendMessage({ type, ...payload });
   if (!res?.ok) throw new Error(res?.error || '未知錯誤');

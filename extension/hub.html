@@ -10,10 +10,19 @@
 <body>
   <header>
     <h1><img src="icons/icon256.png" alt="" width="48" height="48"><b>Persona<span>Hub</span></b></h1>
-    <div id="toolbar" hidden>
-      <button id="btn-save" class="ghost">立即保存</button>
-      <button id="btn-settings" class="ghost">設定</button>
-      <button id="btn-lock" class="danger">鎖定並登出</button>
+    <div class="header-end">
+      <div id="toolbar" hidden>
+        <button id="btn-save" class="ghost">立即保存</button>
+        <button id="btn-settings" class="ghost">設定</button>
+        <button id="btn-lock" class="danger">鎖定並登出</button>
+      </div>
+      <fieldset class="theme" id="theme">
+        <legend>主題</legend>
+        <label><input type="radio" name="theme" value="system"><span>系統</span></label>
+        <label><input type="radio" name="theme" value="light"><span>淺色</span></label>
+        <label><input type="radio" name="theme" value="dark"><span>深色</span></label>
+        <i class="seg-thumb" aria-hidden="true"></i>
+      </fieldset>
     </div>
   </header>
 
