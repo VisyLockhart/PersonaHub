@@ -137,6 +137,12 @@ async function closeServiceTabs() {
 
 // 已確認登入 cookie 的服務:目前沒登入就不覆蓋舊快照,避免把「已登出」存進去
 async function captureInto(data, svc) {
+  // 不還原的服務不保存;舊版留下的快照順便刪掉
+  if (svc.noRestore) {
+    if (!data.services[svc.id]) return false;
+    delete data.services[svc.id];
+    return true;
+  }
   const cookies = await readCookies(svc);
   const auth = hasAuthCookie(svc, cookies);
   if (auth === false || cookies.length === 0) return false;
@@ -163,13 +169,14 @@ async function status() {
   const out = { hasVault: !!vault, unlocked: !!key, settings: await getSettings(), services: [] };
   const data = key ? await loadData(key) : null;
   for (const svc of SERVICES) {
-    const snap = data?.services[svc.id];
+    const snap = svc.noRestore ? null : data?.services[svc.id];
     out.services.push({
       id: svc.id,
       name: svc.name,
       color: svc.color,
       url: svc.url,
       embed: !!svc.embed,
+      noRestore: !!svc.noRestore,
       authKnown: svc.authCookies.length > 0,
       savedAt: snap?.savedAt ?? null,
       hasAuth: snap?.hasAuth ?? null,
@@ -220,7 +227,7 @@ async function openService({ id }, sender) {
   const svc = serviceById(id);
   if (!svc) throw new Error('未知的服務');
   const data = await loadData(await getKey());
-  const snap = data.services[id];
+  const snap = svc.noRestore ? null : data.services[id];
   if (snap) await restoreCookies(snap.cookies);
 
   const auth = hasAuthCookie(svc, await readCookies(svc));

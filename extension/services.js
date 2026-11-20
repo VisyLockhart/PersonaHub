@@ -4,6 +4,7 @@
 // origins      鎖定時一併清除 localStorage / IndexedDB 等站台資料的來源
 // authCookies  代表「已登入」的 cookie 名稱;空陣列 = 尚未確認,不做登入判斷
 // loginUrl     登入過期時開啟的官方登入頁
+// noRestore    true = 不保存、不還原(登入受裝置綁定保護,寫回的 cookie 會被作廢),鎖定時照樣清除。見 D-0004
 // embed        [實驗] 可在入口頁內嵌開啟;embedLogin: false = 登入頁不能內嵌,過期時改用一般開啟方式
 
 export const SERVICES = [
@@ -40,6 +41,8 @@ export const SERVICES = [
     domains: ['youtube.com', 'google.com', 'google.com.tw'],
     origins: ['https://www.youtube.com', 'https://music.youtube.com', 'https://accounts.google.com'],
     authCookies: ['SAPISID'],
+    // Google 帳號受 DBSC 裝置綁定保護(__Secure-*PSIDTS),還原必定被登出
+    noRestore: true,
     // 不內嵌:框架內播放一般影片時框架崩潰(Shorts 正常),一般分頁可播。見 D-0003 R-006
     embed: false,
     embedLogin: false,
