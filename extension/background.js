@@ -439,6 +439,24 @@ chrome.tabs.onUpdated.addListener((tabId, info, tab) => {
   );
 });
 
+// cookie 一變動就保存(延遲合併)。Google 等服務會輪替登入 cookie,若快照停在舊的那份,
+// 還原時會被判定無效而登出。只處理新增／覆寫,忽略刪除:鎖定、清除時的刪除不能存進快照。
+// 鎖定狀態沒有金鑰,captureServices 會直接跳過。
+const cookieTimers = new Map();
+chrome.cookies.onChanged.addListener(({ removed, cookie }) => {
+  if (removed) return;
+  const svc = serviceForUrl(`https://${cookie.domain.replace(/^\./, '')}/`);
+  if (!svc) return;
+  clearTimeout(cookieTimers.get(svc.id));
+  cookieTimers.set(
+    svc.id,
+    setTimeout(() => {
+      cookieTimers.delete(svc.id);
+      captureServices([svc]);
+    }, 5000),
+  );
+});
+
 // 安全網:瀏覽器啟動時一定是鎖定狀態(session 已清空),清掉上次沒鎖就關閉時留下的登入資料
 chrome.runtime.onStartup.addListener(async () => {
   if (!(await getVault())) return;

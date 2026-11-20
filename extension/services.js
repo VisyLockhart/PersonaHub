@@ -40,7 +40,8 @@ export const SERVICES = [
     domains: ['youtube.com', 'google.com', 'google.com.tw'],
     origins: ['https://www.youtube.com', 'https://music.youtube.com', 'https://accounts.google.com'],
     authCookies: ['SAPISID'],
-    embed: true,
+    // 不內嵌:框架內播放一般影片時框架崩潰(Shorts 正常),一般分頁可播。見 D-0003 R-006
+    embed: false,
     embedLogin: false,
   },
   {
