@@ -34,6 +34,7 @@
 
 | 項目 | 怎麼驗 |
 |---|---|
+| 重新載入／更新外掛時清除所有服務登入 | 重新載入外掛 → 開 Spotify、YouTube 確認已登出 |
 | YouTube 改為不還原（D-0004）：卡片顯示「每次解鎖後需重新登入」，鎖定後點卡片開登入頁 | 鎖定 → 解鎖 → 點 YouTube |
 | Spotify 還原後每次跳 cookie 政策橫幅，原因未查明（同意 cookie `OptanonConsent` 應有被保存） | 使用者截橫幅畫面與 Application → Cookies 名稱清單 |
 | 服務卡片 `_favicon` 圖示、主題切換、設定頁「返回」修正 | 入口頁實際操作 |

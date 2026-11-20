@@ -465,12 +465,16 @@ chrome.cookies.onChanged.addListener(({ removed, cookie }) => {
 });
 
 // 安全網:瀏覽器啟動時一定是鎖定狀態(session 已清空),清掉上次沒鎖就關閉時留下的登入資料
-chrome.runtime.onStartup.addListener(async () => {
+async function wipeWhileLocked() {
   if (!(await getVault())) return;
   await closeServiceTabs();
   for (const svc of SERVICES) await wipeService(svc);
   await updateBadge();
-});
+}
+chrome.runtime.onStartup.addListener(wipeWhileLocked);
+// 外掛安裝、更新、重新載入時 storage.session 會被清空(變成鎖定),
+// 但各服務的登入還留著;比照瀏覽器啟動清掉,維持「鎖定 = 已登出」
+chrome.runtime.onInstalled.addListener(wipeWhileLocked);
 
 applyIdleSetting();
 updateBadge();
