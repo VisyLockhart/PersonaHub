@@ -223,6 +223,18 @@ $('#btn-settings-close').addEventListener('click', () => {
   refresh();
 });
 
+// 建立桌面捷徑:把外掛內附的腳本加上本外掛 ID,複製成可直接貼進 PowerShell 的指令
+$('#btn-shortcut').addEventListener('click', () =>
+  busy($('#btn-shortcut'), async () => {
+    const script = await (await fetch(chrome.runtime.getURL('shortcut/create-shortcut.ps1'))).text();
+    await navigator.clipboard.writeText(`& {
+$ExtensionId = '${chrome.runtime.id}'
+${script.trimStart()}
+}`);
+    say('已複製。開啟 PowerShell,貼上後按 Enter。');
+  }),
+);
+
 $('#view-settings').addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;

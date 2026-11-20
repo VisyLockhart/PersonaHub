@@ -163,6 +163,9 @@ main { max-width: 1040px; margin: 0 auto; padding: 24px 24px 64px; }
 }
 #view-settings.narrow { margin-top: 0; max-width: 540px; }
 
+/* 設定頁：桌面捷徑 */
+.shortcut { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+
 /* 設定頁底部：完整原圖 */
 .about {
   display: flex;

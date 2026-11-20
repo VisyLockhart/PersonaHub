@@ -16,6 +16,10 @@
 3. 按「載入未封裝項目」，選擇本 repo 的 `extension/` 資料夾。
 4. 點工具列上的 PersonaHub 圖示，建立主密碼。
 
+## 桌面捷徑（Windows）
+
+入口頁「設定」→「複製建立桌面捷徑的指令」，貼到 PowerShell 按 Enter，桌面會出現 PersonaHub 捷徑：使用 PersonaHub 圖示、直接用裝了外掛的設定檔開啟解鎖畫面。右鍵捷徑可釘選到工作列。腳本在 `extension/shortcut/create-shortcut.ps1`，也可以直接執行：`powershell -ExecutionPolicy Bypass -File extension/shortcut/create-shortcut.ps1 <外掛 ID>`。
+
 ## 使用
 
 | 時機 | 操作 |
@@ -39,6 +43,8 @@ Spotify、YouTube 的官方 PWA 和這個設定檔共用 cookie。用 PersonaHub
 - 綁定 IP 或裝置的登入（例如部分 Google 安全機制）還原後可能失效，這時會走重新登入流程。
 - Uber Eats、Friday影音的登入 cookie 名稱尚未確認，所以目前不判斷是否已登入，一律直接打開首頁。
 - YouTube 會一併保存 google.com 的 cookie，因此還原後這個設定檔裡的 Google 帳號也是登入狀態。
+
+- 「PersonaHub 視窗」是一般 Chrome 視窗，會有網址列與工具列；Chrome 的 App 視窗（獨立視窗）沒有分頁列，兩者無法合併。
 
 ## 新增服務
 
