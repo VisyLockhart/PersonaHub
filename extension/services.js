@@ -79,10 +79,12 @@ export const SERVICES = [
     loginUrl: 'https://claude.ai/login',
     domains: ['claude.ai'],
     origins: ['https://claude.ai'],
-    authCookies: ['sessionKey'], // 2026-11-21 實測確認;Device bound sessions [待確認]
+    authCookies: ['sessionKey'],
+    // 2026-11-21 實測:claude.ai 有 Device bound session,寫回的 cookie 會被作廢。見 D-0004
+    noRestore: true,
+    noRestoreReason: 'Claude 裝置綁定',
+    // 內嵌可用但沒有左側欄(改 SameSite 無效,推測是框架內不顯示)
     embed: true,
-    // 側欄展開狀態;內嵌時讀不到 Lax cookie,側欄預設收起 [待確認是否為原因]
-    frameCookies: ['user-sidebar-visible-on-load'],
     // 登入走 Google OAuth 或 email 連結,框架內不保證能完成
     embedLogin: false,
   },
