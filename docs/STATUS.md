@@ -26,6 +26,7 @@
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
+| 「PersonaHub 視窗」開啟方式（D-0003）：連點多個服務都進同一視窗的群組、重複點會切換、鎖定後視窗關閉 | 設定頁切到「PersonaHub 視窗」後逐一點服務 |
 
 ## 3. 未決問題
 

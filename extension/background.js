@@ -227,12 +227,52 @@ async function openService({ id }) {
   const url = needsLogin ? svc.loginUrl : svc.url;
 
   const { openMode } = await getSettings();
-  if (openMode === 'window') {
+  if (openMode === 'group') {
+    await openInGroupWindow(svc, url);
+  } else if (openMode === 'window') {
     await chrome.windows.create({ url, type: 'popup', width: 1280, height: 820 });
   } else {
     await chrome.tabs.create({ url });
   }
   return { needsLogin };
+}
+
+// PersonaHub 專用視窗:所有服務開在同一個一般視窗,收進名為 PersonaHub 的分頁群組。
+// 視窗與群組 id 記在 storage.session(瀏覽器關閉就消失,不寫入持久儲存)。
+async function openInGroupWindow(svc, url) {
+  const { hubWindow } = await chrome.storage.session.get('hubWindow');
+  let win = null;
+  if (hubWindow) win = await chrome.windows.get(hubWindow.windowId, { populate: true }).catch(() => null);
+
+  if (!win) {
+    win = await chrome.windows.create({ url, type: 'normal', width: 1280, height: 860, focused: true });
+    const groupId = await chrome.tabs.group({ tabIds: [win.tabs[0].id], createProperties: { windowId: win.id } });
+    await chrome.tabGroups.update(groupId, { title: 'PersonaHub', color: 'blue' });
+    await chrome.storage.session.set({ hubWindow: { windowId: win.id, groupId } });
+    return;
+  }
+
+  // 已經開過這個服務就切過去,不重複開
+  const existing = win.tabs.find((t) => serviceForUrl(t.url || t.pendingUrl || '') === svc);
+  let tabId;
+  if (existing) {
+    tabId = existing.id;
+    // 登入過期時改導到登入頁,否則保留使用者目前看的頁面
+    await chrome.tabs.update(tabId, url === svc.loginUrl ? { active: true, url } : { active: true });
+  } else {
+    tabId = (await chrome.tabs.create({ windowId: win.id, url, active: true })).id;
+  }
+  await chrome.windows.update(win.id, { focused: true });
+
+  // 使用者可能把群組拆掉了,群組不在就重建
+  const group = await chrome.tabGroups.get(hubWindow.groupId).catch(() => null);
+  if (group && group.windowId === win.id) {
+    await chrome.tabs.group({ tabIds: [tabId], groupId: group.id });
+  } else {
+    const groupId = await chrome.tabs.group({ tabIds: [tabId], createProperties: { windowId: win.id } });
+    await chrome.tabGroups.update(groupId, { title: 'PersonaHub', color: 'blue' });
+    await chrome.storage.session.set({ hubWindow: { windowId: win.id, groupId } });
+  }
 }
 
 async function forget({ id }) {

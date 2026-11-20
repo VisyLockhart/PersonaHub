@@ -244,7 +244,7 @@ input[type="password"] { font-family: var(--font-display); letter-spacing: .12em
 .seg-track {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   padding: 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -269,13 +269,14 @@ input[type="password"] { font-family: var(--font-display); letter-spacing: .12em
   top: 4px;
   bottom: 4px;
   left: 4px;
-  width: calc(50% - 4px);
+  width: calc((100% - 8px) / 3);
   border-radius: 5px;
   background: var(--surface);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent), 0 2px 6px rgba(0, 0, 0, .2);
   transition: transform .3s var(--ease-out);
 }
-.seg-track:has(input[value="window"]:checked) .seg-thumb { transform: translateX(100%); }
+.seg-track:has(input[value="tab"]:checked) .seg-thumb { transform: translateX(100%); }
+.seg-track:has(input[value="window"]:checked) .seg-thumb { transform: translateX(200%); }
 
 /* ---------- 按鈕 ---------- */
 button {
