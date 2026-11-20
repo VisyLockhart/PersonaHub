@@ -507,3 +507,8 @@ body.embedding #msg { display: none; }
   .svc .name, .svc .state, .svc .forget { display: none; }
   .svc .logo { min-height: 48px; }
 }
+
+/* ---- 側邊欄(D-0007):壓縮頂端留白 ---- */
+.in-panel main { padding-top: 8px; }
+.in-panel #msg { min-height: 0; margin: 0 0 8px; font-size: 12px; }
+.in-panel #msg:empty { display: none; }
