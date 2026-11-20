@@ -20,4 +20,9 @@
 
 ## 3. 踩過的坑
 
-（尚無）
+### 設了 `display` 的元素，`hidden` 屬性失效
+
+- **現象：** 入口頁同時顯示解鎖表單、服務卡片和設定表單。
+- **根因：** `.narrow { display: flex }` 的優先順序高於瀏覽器預設的 `[hidden] { display: none }`。
+- **之後：** `hub.css` 保留 `[hidden] { display: none !important; }`。
+- **來源：** 2026-11-20 使用者實測
