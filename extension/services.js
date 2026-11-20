@@ -79,8 +79,10 @@ export const SERVICES = [
     loginUrl: 'https://claude.ai/login',
     domains: ['claude.ai'],
     origins: ['https://claude.ai'],
-    authCookies: ['sessionKey'], // [待確認] 實測確認名稱,並看 Device bound sessions
+    authCookies: ['sessionKey'], // 2026-11-21 實測確認;Device bound sessions [待確認]
     embed: true,
+    // 側欄展開狀態;內嵌時讀不到 Lax cookie,側欄預設收起 [待確認是否為原因]
+    frameCookies: ['user-sidebar-visible-on-load'],
     // 登入走 Google OAuth 或 email 連結,框架內不保證能完成
     embedLogin: false,
   },

@@ -20,6 +20,8 @@
 使用者在獨立的本機 Chrome 設定檔「PersonaHub 測試」（`Profile 1`，不登入 Google）載入外掛測試。
 
 **已驗證（2026-11-20～21，使用者實測）：**
+- Claude：登入 cookie 為 `sessionKey`；內嵌可開啟、可使用，但左側欄不見（2026-11-21）
+- Discord：內嵌可用；鎖定後登出（2026-11-21）
 - 內嵌原型：Spotify、Netflix 能內嵌並播放；YouTube 一般影片在框架內崩潰（一般分頁可播），已改回不內嵌
 - 建立主密碼、解鎖、入口頁顯示
 - Spotify：鎖定 → 解鎖、關閉瀏覽器重開，都能還原為已登入（2026-11-21）
@@ -38,8 +40,8 @@
 | 服務卡片 `_favicon` 圖示、主題切換、設定頁「返回」修正 | 入口頁實際操作 |
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
-| Claude：登入 cookie 是否為 `sessionKey`、有無 Device bound sessions、還原後登入、內嵌是否可用 | DevTools → Application → Cookies／Device bound sessions；鎖定→解鎖點卡片 |
-| Discord：內嵌是否可用、鎖定後是否登出（清除 localStorage） | 開內嵌點卡片；鎖定後重開 |
+| Claude：有無 Device bound sessions（有 `__Host-sessionBinding` cookie，疑似綁定）、鎖定→解鎖後是否仍登入 | 展開 DevTools → Application → Device bound sessions；鎖定→解鎖點卡片 |
+| Claude 內嵌側欄消失：`user-sidebar-visible-on-load` 改 SameSite=None 後是否恢復 | 鎖定→解鎖（還原時才改寫）後開內嵌 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
 | 捷徑釘選到工作列後，入口頁 App 視窗是否獨立一顆、顯示 PersonaHub 圖示 | 釘選後觀察 |
 
