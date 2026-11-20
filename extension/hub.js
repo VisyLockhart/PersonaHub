@@ -155,6 +155,7 @@ function renderGrid(services) {
     // 外層是 div,開啟與清除是兩個並列的 button(button 不能巢狀)
     const card = document.createElement('div');
     card.className = 'svc';
+    card.dataset.id = s.id;
     card.style.setProperty('--svc', s.color);
     card.style.setProperty('--i', i);
     card.innerHTML = `<span class="logo"><img alt=""></span><span class="name"></span><span class="state ${st.cls}"></span><button type="button" class="open"></button>`;
@@ -172,6 +173,7 @@ function renderGrid(services) {
       busy(open, async () => {
         const r = await send('open', { id: s.id });
         if (r.embed) openFrame(s, r.embed.url);
+        if (r.split) for (const c of grid.querySelectorAll('.svc')) c.classList.toggle('active', c === card);
         say(r.notice ? r.notice : r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(${s.noRestoreReason || '無法還原'})。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
       }),
     );

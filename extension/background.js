@@ -6,7 +6,7 @@ import * as C from './crypto.js';
 //   vault 解密後:       { services: { [id]: { cookies: [...], savedAt, hasAuth } } }
 // chrome.storage.session { k: <AES 金鑰 raw b64> }   ← 有它 = 已解鎖;關閉瀏覽器自動消失
 
-const DEFAULT_SETTINGS = { idleMinutes: 15, lockOnScreenLock: true, openMode: 'tab', embed: false };
+const DEFAULT_SETTINGS = { idleMinutes: 15, lockOnScreenLock: true, openMode: 'split', embed: false };
 const AUTOSAVE_MINUTES = 10;
 
 // ---------- 基本存取 ----------
