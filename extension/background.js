@@ -99,7 +99,8 @@ async function restoreCookies(cookies, frameCookies = []) {
     if (!c.hostOnly) d.domain = c.domain;
     if (c.sameSite && c.sameSite !== 'unspecified') d.sameSite = c.sameSite;
     // 內嵌框架是第三方情境,網站自己寫的 Lax cookie 讀寫不到;同意紀錄這類非登入 cookie 放寬
-    if (frameCookies.includes(c.name)) Object.assign(d, { sameSite: 'no_restriction', secure: true });
+    // Secure cookie 必須用 https 網址寫入,否則 chrome.cookies.set 會失敗
+    if (frameCookies.includes(c.name)) Object.assign(d, { sameSite: 'no_restriction', secure: true, url: cookieUrl({ ...c, secure: true }) });
     if (!c.session && c.expirationDate) d.expirationDate = c.expirationDate;
     if (c.partitionKey) d.partitionKey = c.partitionKey;
     try {
