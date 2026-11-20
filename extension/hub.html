@@ -4,11 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PersonaHub</title>
+  <link rel="icon" href="icons/icon32.png">
   <link rel="stylesheet" href="hub.css">
 </head>
 <body>
   <header>
-    <h1>PersonaHub</h1>
+    <h1><img src="icons/icon256.png" alt="" width="48" height="48"><b>Persona<span>Hub</span></b></h1>
     <div id="toolbar" hidden>
       <button id="btn-save" class="ghost">立即保存</button>
       <button id="btn-settings" class="ghost">設定</button>
@@ -41,13 +42,15 @@
     <form id="view-settings" class="card narrow" hidden>
       <h2>設定</h2>
       <label>閒置多久自動鎖定(分鐘,0 = 不自動鎖定)<input type="number" name="idleMinutes" min="0" max="240"></label>
-      <label class="row"><input type="checkbox" name="lockOnScreenLock"> Windows 鎖定畫面(Win+L)時一併鎖定</label>
-      <label>開啟服務的方式
-        <select name="openMode">
-          <option value="tab">新分頁(可用 Bitwarden 等外掛)</option>
-          <option value="window">獨立視窗(像 App,但沒有外掛列)</option>
-        </select>
-      </label>
+      <label class="row switch"><input type="checkbox" name="lockOnScreenLock" role="switch"><span class="track" aria-hidden="true"></span>Windows 鎖定畫面(Win+L)時一併鎖定</label>
+      <fieldset class="segmented">
+        <legend>開啟服務的方式</legend>
+        <div class="seg-track">
+          <label><input type="radio" name="openMode" value="tab"><span>新分頁<small>可用 Bitwarden 等外掛</small></span></label>
+          <label><input type="radio" name="openMode" value="window"><span>獨立視窗<small>像 App,沒有外掛列</small></span></label>
+          <i class="seg-thumb" aria-hidden="true"></i>
+        </div>
+      </fieldset>
       <div class="row">
         <button type="submit">儲存</button>
         <button type="button" id="btn-settings-close" class="ghost">返回</button>

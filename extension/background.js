@@ -168,6 +168,7 @@ async function status() {
       id: svc.id,
       name: svc.name,
       color: svc.color,
+      url: svc.url,
       authKnown: svc.authCookies.length > 0,
       savedAt: snap?.savedAt ?? null,
       hasAuth: snap?.hasAuth ?? null,

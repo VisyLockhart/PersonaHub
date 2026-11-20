@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "一鍵還原/清除個人服務的登入狀態,登入資料以主密碼加密保存。",
   "minimum_chrome_version": "120",
-  "permissions": ["cookies", "storage", "tabs", "idle", "alarms", "browsingData"],
+  "permissions": ["cookies", "storage", "tabs", "idle", "alarms", "browsingData", "favicon"],
   "host_permissions": [
     "*://*.spotify.com/*",
     "*://*.netflix.com/*",
@@ -20,8 +20,18 @@
     "service_worker": "background.js",
     "type": "module"
   },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
   "action": {
-    "default_title": "PersonaHub"
+    "default_title": "PersonaHub",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
   },
   "commands": {
     "lock-now": {

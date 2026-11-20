@@ -1,6 +1,7 @@
 const $ = (sel) => document.querySelector(sel);
 const views = ['setup', 'unlock', 'hub', 'settings'];
 let current = null;
+let shown = null;
 
 async function send(type, payload = {}) {
   const res = await chrome.runtime.sendMessage({ type, ...payload });
@@ -41,30 +42,67 @@ function stateOf(s) {
   return { text: t, cls: 'ok' };
 }
 
+function faviconUrl(pageUrl) {
+  const u = new URL(chrome.runtime.getURL('/_favicon/'));
+  u.searchParams.set('pageUrl', pageUrl);
+  u.searchParams.set('size', '64');
+  return u.toString();
+}
+
+// 卡片框線跟著游標發光(Border Spotlight);rAF 節流,只在游標位於卡片區時計算
+let spot = null;
+document.addEventListener('pointermove', (e) => {
+  if (spot || !e.target.closest?.('#grid')) return;
+  spot = requestAnimationFrame(() => {
+    spot = null;
+    for (const card of document.querySelectorAll('.svc')) {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }
+  });
+});
+
+function shake(el) {
+  el.classList.remove('shake');
+  void el.offsetWidth;
+  el.classList.add('shake');
+}
+
 function renderGrid(services) {
   const grid = $('#grid');
   grid.replaceChildren();
-  for (const s of services) {
+  services.forEach((s, i) => {
     const st = stateOf(s);
-    const card = document.createElement('button');
+    // 外層是 div,開啟與清除是兩個並列的 button(button 不能巢狀)
+    const card = document.createElement('div');
     card.className = 'svc';
     card.style.setProperty('--svc', s.color);
-    card.innerHTML = `<span class="name"></span><span class="state ${st.cls}"></span>`;
+    card.style.setProperty('--i', i);
+    card.innerHTML = `<span class="logo"><img alt=""></span><span class="name"></span><span class="state ${st.cls}"></span><button type="button" class="open"></button>`;
+    // Chrome 內建的網站圖示快取(_favicon),不會對外連線;沒造訪過的網站會是預設地球圖示
+    const img = card.querySelector('.logo img');
+    img.addEventListener('error', () => {
+      img.replaceWith(Object.assign(document.createElement('b'), { className: 'initial', textContent: s.name[0] }));
+    });
+    img.src = faviconUrl(s.url);
     card.querySelector('.name').textContent = s.name;
     card.querySelector('.state').textContent = st.text;
-    card.addEventListener('click', () =>
-      busy(card, async () => {
+    const open = card.querySelector('.open');
+    open.setAttribute('aria-label', `開啟 ${s.name}(${st.text})`);
+    open.addEventListener('click', () =>
+      busy(open, async () => {
         const r = await send('open', { id: s.id });
         say(r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
       }),
     );
     if (s.savedAt) {
       const forget = document.createElement('button');
+      forget.type = 'button';
       forget.className = 'link forget';
       forget.textContent = '清除';
       forget.title = '刪除此服務的保存資料並登出';
-      forget.addEventListener('click', (e) => {
-        e.stopPropagation();
+      forget.addEventListener('click', () => {
         if (!confirm(`刪除 ${s.name} 的保存資料並登出?`)) return;
         busy(forget, async () => {
           await send('forget', { id: s.id });
@@ -74,7 +112,7 @@ function renderGrid(services) {
       card.append(forget);
     }
     grid.append(card);
-  }
+  });
 }
 
 function fillSettings(settings) {
@@ -91,6 +129,8 @@ async function refresh(message = '') {
   else if (!st.unlocked) current = 'unlock';
   else if (current !== 'settings') current = 'hub';
   if (st.unlocked) renderGrid(st.services);
+  $('#grid').classList.toggle('enter', current === 'hub' && shown !== 'hub');
+  shown = current;
   show(current);
   say(message);
   if (current === 'unlock') $('#view-unlock').password.focus();
@@ -99,7 +139,10 @@ async function refresh(message = '') {
 $('#view-setup').addEventListener('submit', (e) => {
   e.preventDefault();
   const f = e.target;
-  if (f.password.value !== f.confirm.value) return say('兩次輸入的主密碼不同', true);
+  if (f.password.value !== f.confirm.value) {
+    shake(f);
+    return say('兩次輸入的主密碼不同', true);
+  }
   busy(f.querySelector('button'), async () => {
     say('建立中…(金鑰衍生需要幾秒)');
     await send('setup', { password: f.password.value });
@@ -115,6 +158,9 @@ $('#view-unlock').addEventListener('submit', (e) => {
     say('解鎖中…');
     try {
       await send('unlock', { password: f.password.value });
+    } catch (err) {
+      shake(f);
+      throw err;
     } finally {
       f.reset();
     }
