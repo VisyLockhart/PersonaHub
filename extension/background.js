@@ -474,9 +474,7 @@ async function wipeWhileLocked() {
   await updateBadge();
 }
 chrome.runtime.onStartup.addListener(wipeWhileLocked);
-// 外掛安裝、更新、重新載入時 storage.session 會被清空(變成鎖定),
-// 但各服務的登入還留著;比照瀏覽器啟動清掉,維持「鎖定 = 已登出」
-chrome.runtime.onInstalled.addListener(wipeWhileLocked);
+// 外掛重新載入／更新時不清除:使用者選擇保留登入(storage.session 被清空,外掛會顯示鎖定)
 
 applyIdleSetting();
 updateBadge();
