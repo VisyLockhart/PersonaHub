@@ -8,26 +8,39 @@
 
 | 元件 | 狀態 | 版本 | 現況 |
 |---|---|---|---|
-| 外掛 `extension/` | 已 push | 0.1.0 | MVP：建立 Vault、解鎖、服務卡片、還原、鎖定清除、自動保存、閒置鎖定 |
+| 外掛 `extension/` | 已 push，部分驗收 | 0.1.0 | MVP：建立 Vault、解鎖、服務卡片、還原、鎖定清除、自動保存、閒置鎖定 |
 
-## 2. 未驗證
+## 2. 驗證
+
+使用者在獨立的本機 Chrome 設定檔「PersonaHub 測試」（不登入 Google）載入外掛測試。
+
+**已驗證（2026-11-20，使用者實測）：**
+- 建立主密碼、解鎖、入口頁顯示（修正 `hidden` 被 CSS 蓋掉的 bug 之後）
+- Spotify：登入後自動保存、鎖定後登出、Win+L 觸發鎖定並登出
+
+**尚未驗證：**
 
 | 項目 | 怎麼驗 |
 |---|---|
-| 在真實 Chrome 載入外掛，整個流程跑一次 | 使用者在個人設定檔載入 `extension/` |
-| 各服務鎖定後是否真的登出、還原後是否維持登入 | 逐一測試五個服務 |
+| Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
+| Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
 
 ## 3. 未決問題
 
 | # | 問題 | 影響 | 建議 |
 |---|---|---|---|
-| Q-1 | Uber Eats、Friday影音的登入 cookie 名稱 `[待確認]` | 無法判斷是否過期、可能把已登出狀態存進去 | 登入後在 DevTools → Application → Cookies 找出登入 cookie，補進 `services.js` 的 `authCookies` |
+| Q-1 | Uber Eats、Friday影音的登入 cookie 名稱 `[待確認]` | 無法判斷是否過期、可能把已登出狀態存進去 | 使用者登入後截 DevTools → Application → Cookies（遮住 Value），補進 `services.js` 的 `authCookies` |
 | Q-2 | Friday影音的登入是否經過 fetnet.net 以外的網域 `[待確認]` | 還原可能不完整 | 同上，觀察登入流程的網域 |
 
 ## 4. 下一步候選
 
-1. 使用者實測後回報問題並修正
-2. 補 Q-1、Q-2
+1. 入口頁 UI 重新設計（使用者已加入 `frontend-design` skill，在新對話進行）
+2. 完成 §2 尚未驗證的項目，補 Q-1、Q-2
 3. 外掛圖示
 4. 可在入口頁新增自訂服務（不用改程式碼）
+
+## 5. 備忘
+
+- 測試用設定檔不可用日常設定檔：鎖定會清掉 google.com 等網域的 cookie，會登出 Gmail 等所有 Google 服務。
+- Win+L 時 FFXIV 斷線是遊戲本身的問題（實測鎖定期間網路沒有中斷），與 PersonaHub 無關。
