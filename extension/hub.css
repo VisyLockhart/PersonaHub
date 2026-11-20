@@ -463,3 +463,17 @@ button:disabled { opacity: .55; cursor: wait; }
   .card { padding: 22px 18px; }
   .narrow { margin-top: 4vh; }
 }
+
+/* ---- 內嵌分頁(實驗) ---- */
+.tabbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 12px; border-bottom: 1px solid var(--line); }
+.tabbar .tab { display: flex; align-items: center; border: 1px solid var(--line); border-bottom: 0; border-radius: 8px 8px 0 0; background: var(--surface-2); }
+.tabbar .tab[aria-selected="true"] { background: var(--surface); box-shadow: inset 0 3px 0 var(--svc, var(--gold)); }
+.tabbar button { background: transparent; color: var(--ink); border: 0; padding: 8px 12px; border-radius: 0; box-shadow: none; }
+.tabbar button::after { display: none !important; }
+.tabbar .tab.home { padding: 8px 14px; background: var(--surface-2); color: var(--ink); border: 1px solid var(--line); border-bottom: 0; border-radius: 8px 8px 0 0; }
+.tabbar .tab-open { display: flex; align-items: center; gap: 6px; }
+.tabbar .tab-close { padding: 8px 10px 8px 2px; color: var(--muted); }
+.tabbar .tab-close:hover { color: var(--danger); }
+.frames iframe { display: block; width: 100%; height: calc(100vh - 210px); min-height: 360px; border: 1px solid var(--line); border-radius: 8px; background: #000; }
+body.embedding main { max-width: none; padding: 12px 16px 16px; }
+body.embedding #msg { display: none; }

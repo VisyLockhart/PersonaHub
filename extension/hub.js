@@ -91,6 +91,61 @@ function shake(el) {
   el.classList.add('shake');
 }
 
+// ---- 內嵌分頁(實驗) ----
+// 每個服務一個 iframe,切換分頁只切顯示,不重新載入(保留播放狀態)
+const frames = new Map(); // id -> { tab, frame }
+
+function selectTab(id) {
+  $('#tabbar').hidden = frames.size === 0;
+  const home = id === 'home' || !frames.has(id);
+  $('#grid').hidden = !home;
+  document.body.classList.toggle('embedding', !home);
+  for (const t of $('#tabbar').querySelectorAll('.tab')) t.setAttribute('aria-selected', String(t.dataset.tab === (home ? 'home' : id)));
+  for (const [fid, f] of frames) f.frame.hidden = fid !== id;
+}
+
+function openFrame(s, url) {
+  let f = frames.get(s.id);
+  if (!f) {
+    const tab = document.createElement('div');
+    tab.className = 'tab';
+    tab.dataset.tab = s.id;
+    tab.style.setProperty('--svc', s.color);
+    tab.innerHTML = '<button type="button" class="tab-open"><img alt="" width="16" height="16"><span></span></button><button type="button" class="tab-close" aria-label="關閉">×</button>';
+    tab.querySelector('img').src = faviconUrl(s.url);
+    tab.querySelector('span').textContent = s.name;
+    tab.querySelector('.tab-open').addEventListener('click', () => selectTab(s.id));
+    tab.querySelector('.tab-close').addEventListener('click', () => closeFrame(s.id));
+    $('#tabbar').append(tab);
+    const frame = document.createElement('iframe');
+    frame.title = s.name;
+    frame.allow = 'encrypted-media; fullscreen; autoplay; picture-in-picture; clipboard-write';
+    frame.allowFullscreen = true;
+    frame.src = url;
+    $('#frames').append(frame);
+    f = { tab, frame };
+    frames.set(s.id, f);
+  } else if (f.frame.src !== url && url !== s.url) {
+    f.frame.src = url;
+  }
+  selectTab(s.id);
+}
+
+function closeFrame(id) {
+  const f = frames.get(id);
+  if (!f) return;
+  f.tab.remove();
+  f.frame.remove();
+  frames.delete(id);
+  selectTab('home');
+}
+
+function closeAllFrames() {
+  for (const id of [...frames.keys()]) closeFrame(id);
+}
+
+$('#tabbar .home').addEventListener('click', () => selectTab('home'));
+
 function renderGrid(services) {
   const grid = $('#grid');
   grid.replaceChildren();
@@ -115,6 +170,7 @@ function renderGrid(services) {
     open.addEventListener('click', () =>
       busy(open, async () => {
         const r = await send('open', { id: s.id });
+        if (r.embed) openFrame(s, r.embed.url);
         say(r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
       }),
     );
@@ -142,6 +198,7 @@ function fillSettings(settings) {
   f.idleMinutes.value = settings.idleMinutes;
   f.lockOnScreenLock.checked = settings.lockOnScreenLock;
   f.openMode.value = settings.openMode;
+  f.embed.checked = settings.embed;
 }
 
 async function refresh(message = '') {
@@ -150,6 +207,7 @@ async function refresh(message = '') {
   if (!st.hasVault) current = 'setup';
   else if (!st.unlocked) current = 'unlock';
   else if (current !== 'settings') current = 'hub';
+  if (!st.unlocked) closeAllFrames(); // 鎖定後不留任何已登入的框架
   if (st.unlocked) renderGrid(st.services);
   $('#grid').classList.toggle('enter', current === 'hub' && shown !== 'hub');
   shown = current;
@@ -240,7 +298,7 @@ $('#view-settings').addEventListener('submit', (e) => {
   const f = e.target;
   busy(f.querySelector('button[type=submit]'), async () => {
     await send('settings', {
-      settings: { idleMinutes: Number(f.idleMinutes.value), lockOnScreenLock: f.lockOnScreenLock.checked, openMode: f.openMode.value },
+      settings: { idleMinutes: Number(f.idleMinutes.value), lockOnScreenLock: f.lockOnScreenLock.checked, openMode: f.openMode.value, embed: f.embed.checked },
     });
     current = 'hub';
     await refresh('設定已儲存');
@@ -248,7 +306,9 @@ $('#view-settings').addEventListener('submit', (e) => {
 });
 
 // 其他地方(快捷鍵、閒置)鎖定時,入口頁跟著更新
-chrome.storage.session.onChanged.addListener(() => refresh());
+chrome.storage.session.onChanged.addListener((changes) => {
+  if ('k' in changes) refresh();
+});
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) refresh();
 });

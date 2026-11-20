@@ -4,6 +4,7 @@
 // origins      鎖定時一併清除 localStorage / IndexedDB 等站台資料的來源
 // authCookies  代表「已登入」的 cookie 名稱;空陣列 = 尚未確認,不做登入判斷
 // loginUrl     登入過期時開啟的官方登入頁
+// embed        [實驗] 可在入口頁內嵌開啟;embedLogin: false = 登入頁不能內嵌,過期時改用一般開啟方式
 
 export const SERVICES = [
   {
@@ -15,6 +16,7 @@ export const SERVICES = [
     domains: ['spotify.com'],
     origins: ['https://open.spotify.com', 'https://accounts.spotify.com', 'https://www.spotify.com'],
     authCookies: ['sp_dc'],
+    embed: true,
   },
   {
     id: 'netflix',
@@ -37,6 +39,8 @@ export const SERVICES = [
     domains: ['youtube.com', 'google.com', 'google.com.tw'],
     origins: ['https://www.youtube.com', 'https://music.youtube.com', 'https://accounts.google.com'],
     authCookies: ['SAPISID'],
+    embed: true,
+    embedLogin: false,
   },
   {
     id: 'ubereats',

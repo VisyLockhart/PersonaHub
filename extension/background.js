@@ -6,7 +6,7 @@ import * as C from './crypto.js';
 //   vault 解密後:       { services: { [id]: { cookies: [...], savedAt, hasAuth } } }
 // chrome.storage.session { k: <AES 金鑰 raw b64> }   ← 有它 = 已解鎖;關閉瀏覽器自動消失
 
-const DEFAULT_SETTINGS = { idleMinutes: 15, lockOnScreenLock: true, openMode: 'tab' };
+const DEFAULT_SETTINGS = { idleMinutes: 15, lockOnScreenLock: true, openMode: 'tab', embed: false };
 const AUTOSAVE_MINUTES = 10;
 
 // ---------- 基本存取 ----------
@@ -169,6 +169,7 @@ async function status() {
       name: svc.name,
       color: svc.color,
       url: svc.url,
+      embed: !!svc.embed,
       authKnown: svc.authCookies.length > 0,
       savedAt: snap?.savedAt ?? null,
       hasAuth: snap?.hasAuth ?? null,
@@ -214,7 +215,7 @@ async function lock() {
   await updateBadge();
 }
 
-async function openService({ id }) {
+async function openService({ id }, sender) {
   await requireKey();
   const svc = serviceById(id);
   if (!svc) throw new Error('未知的服務');
@@ -226,7 +227,12 @@ async function openService({ id }) {
   const needsLogin = auth === false;
   const url = needsLogin ? svc.loginUrl : svc.url;
 
-  const { openMode } = await getSettings();
+  const { openMode, embed } = await getSettings();
+  // 實驗:在入口頁內嵌開啟。Google 登入頁不允許在框架內登入,登入過期時退回一般開啟方式
+  if (embed && svc.embed && sender?.tab?.id != null && !(needsLogin && svc.embedLogin === false)) {
+    await allowEmbedIn(sender.tab.id);
+    return { needsLogin, embed: { url } };
+  }
   if (openMode === 'group') {
     await openInGroupWindow(svc, url);
   } else if (openMode === 'window') {
@@ -274,6 +280,51 @@ async function openInGroupWindow(svc, url) {
     await chrome.storage.session.set({ hubWindow: { windowId: win.id, groupId } });
   }
 }
+
+// ---------- 內嵌原型(實驗,見 STATUS §4) ----------
+// 只對「入口頁所在分頁」裡、可內嵌服務的子框架回應,移除禁止嵌入的標頭。
+// 用 tabIds 限定範圍:其他網站嵌入這些服務時標頭照常生效。規則是 session rule,瀏覽器關閉就消失。
+const EMBED_RULE_ID = 1;
+const EMBED_DOMAINS = SERVICES.filter((s) => s.embed).map((s) => s.domains[0]);
+
+async function syncEmbedRule(tabIds) {
+  await chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: [EMBED_RULE_ID],
+    addRules: tabIds.length
+      ? [
+          {
+            id: EMBED_RULE_ID,
+            priority: 1,
+            action: {
+              type: 'modifyHeaders',
+              responseHeaders: [
+                { header: 'x-frame-options', operation: 'remove' },
+                // DNR 無法只刪 frame-ancestors 指令,只能整個 CSP 標頭移除
+                { header: 'content-security-policy', operation: 'remove' },
+              ],
+            },
+            condition: { tabIds, resourceTypes: ['sub_frame'], requestDomains: EMBED_DOMAINS },
+          },
+        ]
+      : [],
+  });
+}
+
+async function allowEmbedIn(tabId) {
+  const { embedTabs = [] } = await chrome.storage.session.get('embedTabs');
+  if (embedTabs.includes(tabId)) return;
+  const next = [...embedTabs, tabId];
+  await chrome.storage.session.set({ embedTabs: next });
+  await syncEmbedRule(next);
+}
+
+chrome.tabs.onRemoved.addListener(async (tabId) => {
+  const { embedTabs = [] } = await chrome.storage.session.get('embedTabs');
+  if (!embedTabs.includes(tabId)) return;
+  const next = embedTabs.filter((t) => t !== tabId);
+  await chrome.storage.session.set({ embedTabs: next });
+  await syncEmbedRule(next);
+});
 
 async function forget({ id }) {
   const key = await requireKey();
@@ -341,7 +392,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (sender.id !== chrome.runtime.id || !sender.url?.startsWith(chrome.runtime.getURL(''))) return false;
   const fn = HANDLERS[msg?.type];
   if (!fn) return false;
-  fn(msg)
+  fn(msg, sender)
     .then((r) => sendResponse({ ok: true, ...r }))
     .catch((e) => sendResponse({ ok: false, error: e.message || String(e) }));
   return true;

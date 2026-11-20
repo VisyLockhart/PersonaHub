@@ -45,7 +45,11 @@
     </form>
 
     <section id="view-hub" hidden>
+      <nav id="tabbar" class="tabbar" hidden aria-label="內嵌分頁">
+        <button type="button" class="tab home" data-tab="home">服務</button>
+      </nav>
       <div id="grid" class="grid"></div>
+      <div id="frames" class="frames"></div>
     </section>
 
     <form id="view-settings" class="card narrow" hidden>
@@ -61,6 +65,8 @@
           <i class="seg-thumb" aria-hidden="true"></i>
         </div>
       </fieldset>
+      <label class="row switch"><input type="checkbox" name="embed" role="switch"><span class="track" aria-hidden="true"></span>實驗:Spotify、YouTube 在入口頁內嵌開啟(分頁列)</label>
+      <p class="hint">原型功能。會在入口頁裡移除這兩個服務禁止被嵌入的防護標頭,只限入口頁所在的分頁。不能顯示或沒登入時,請關掉這個選項。</p>
       <div class="row">
         <button type="submit">儲存</button>
         <button type="button" id="btn-settings-close" class="ghost">返回</button>
