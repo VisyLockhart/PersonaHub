@@ -4,7 +4,8 @@
 // origins      鎖定時一併清除 localStorage / IndexedDB 等站台資料的來源
 // authCookies  代表「已登入」的 cookie 名稱;空陣列 = 尚未確認,不做登入判斷
 // loginUrl     登入過期時開啟的官方登入頁
-// noRestore    true = 不保存、不還原(登入受裝置綁定保護,寫回的 cookie 會被作廢),鎖定時照樣清除。見 D-0004
+// noRestore    true = 不保存、不還原(登入受裝置綁定保護,或登入不在 cookie 裡),鎖定時照樣清除。見 D-0004
+// noRestoreReason 入口頁卡片顯示的原因(noRestore 時)
 // frameCookies 還原時改成 SameSite=None 的非登入 cookie(例如 cookie 政策同意紀錄),內嵌時才讀得到。不可放登入 cookie
 // embed        [實驗] 可在入口頁內嵌開啟;embedLogin: false = 登入頁不能內嵌,過期時改用一般開啟方式
 
@@ -45,6 +46,7 @@ export const SERVICES = [
     authCookies: ['SAPISID'],
     // Google 帳號受 DBSC 裝置綁定保護(__Secure-*PSIDTS),還原必定被登出
     noRestore: true,
+    noRestoreReason: 'Google 裝置綁定',
     // 不內嵌:框架內播放一般影片時框架崩潰(Shorts 正常),一般分頁可播。見 D-0003 R-006
     embed: false,
     embedLogin: false,
@@ -68,6 +70,33 @@ export const SERVICES = [
     domains: ['friday.tw', 'fetnet.net'],
     origins: ['https://video.friday.tw'],
     authCookies: [], // [待確認] 實際登入 cookie 名稱與登入網域
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    color: '#D97757',
+    url: 'https://claude.ai/',
+    loginUrl: 'https://claude.ai/login',
+    domains: ['claude.ai'],
+    origins: ['https://claude.ai'],
+    authCookies: ['sessionKey'], // [待確認] 實測確認名稱,並看 Device bound sessions
+    embed: true,
+    // 登入走 Google OAuth 或 email 連結,框架內不保證能完成
+    embedLogin: false,
+  },
+  {
+    id: 'discord',
+    name: 'Discord',
+    color: '#5865F2',
+    url: 'https://discord.com/channels/@me',
+    loginUrl: 'https://discord.com/login',
+    domains: ['discord.com'],
+    origins: ['https://discord.com'],
+    authCookies: [],
+    // 登入 token 存在 localStorage 不在 cookie,只還原 cookie 不會登入;鎖定時照樣清除站台資料
+    noRestore: true,
+    noRestoreReason: '登入資料不在 cookie',
+    embed: true,
   },
 ];
 

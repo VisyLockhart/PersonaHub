@@ -180,6 +180,7 @@ async function status() {
       url: svc.url,
       embed: !!svc.embed,
       noRestore: !!svc.noRestore,
+      noRestoreReason: svc.noRestoreReason || '',
       authKnown: svc.authCookies.length > 0,
       savedAt: snap?.savedAt ?? null,
       hasAuth: snap?.hasAuth ?? null,

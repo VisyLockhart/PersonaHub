@@ -14,7 +14,9 @@
     "*://*.ubereats.com/*",
     "*://*.uber.com/*",
     "*://*.friday.tw/*",
-    "*://*.fetnet.net/*"
+    "*://*.fetnet.net/*",
+    "*://*.claude.ai/*",
+    "*://*.discord.com/*"
   ],
   "background": {
     "service_worker": "background.js",

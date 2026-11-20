@@ -58,7 +58,7 @@ function fmtTime(ts) {
 }
 
 function stateOf(s) {
-  if (s.noRestore) return { text: '每次解鎖後需重新登入(Google 裝置綁定)', cls: '' };
+  if (s.noRestore) return { text: `每次解鎖後需重新登入(${s.noRestoreReason || '無法還原'})`, cls: '' };
   if (!s.savedAt) return { text: '尚未保存 — 點擊後登入一次', cls: 'warn' };
   const t = `已保存 ${fmtTime(s.savedAt)}`;
   if (!s.authKnown) return { text: `${t}(登入判斷待確認)`, cls: '' };
@@ -172,7 +172,7 @@ function renderGrid(services) {
       busy(open, async () => {
         const r = await send('open', { id: s.id });
         if (r.embed) openFrame(s, r.embed.url);
-        say(r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(Google 不允許還原登入)。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
+        say(r.needsLogin && s.noRestore ? `${s.name} 需要重新登入(${s.noRestoreReason || '無法還原'})。` : r.needsLogin ? `${s.name} 的登入已過期,已開啟登入頁;登入後會自動保存。` : `已開啟 ${s.name}`);
       }),
     );
     if (s.savedAt) {
