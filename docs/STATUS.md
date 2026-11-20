@@ -21,6 +21,7 @@
 使用者在獨立的本機 Chrome 設定檔「PersonaHub 測試」（`Profile 1`，不登入 Google）載入外掛測試。
 
 **已驗證（2026-11-20～21，使用者實測）：**
+- 分割畫面原型：入口頁在左、Spotify 在右並排正常，入口頁縮窄後卡片仍是大卡片版面（2026-11-21）
 - Claude：登入 cookie 為 `sessionKey`；有 Device bound session，比照 D-0004 不還原；內嵌可用但沒有左側欄，`user-sidebar-visible-on-load` 改 SameSite=None 無效（2026-11-21）
 - Discord：內嵌可用；鎖定後登出（2026-11-21）
 - 內嵌原型：Spotify、Netflix 能內嵌並播放；YouTube 一般影片在框架內崩潰（一般分頁可播），已改回不內嵌
@@ -42,7 +43,7 @@
 | Spotify：解鎖後點卡片還原為已登入；未鎖定直接關閉瀏覽器，重開後自動清除 | README 的測試步驟 |
 | Netflix、YouTube、Uber Eats、Friday影音 的保存、還原、清除 | 逐一測試 |
 | Discord localStorage 還原（D-0005）：一般分頁登入→鎖定→解鎖點卡片是否已登入；內嵌登入後同流程 | 先用一般分頁測，再測內嵌 |
-| 分割畫面原型：一般視窗開入口頁、關掉內嵌開關，點 Claude、YouTube 是否在右邊並排；再點別的服務是否換掉右邊；入口頁縮窄後的樣子；App 視窗（popup）中是否退回新分頁 | 設定頁選「分割畫面」後逐一點卡片 |
+| 分割畫面原型：Claude 側欄是否出現、YouTube 能否播放；再點別的服務是否換掉右邊；入口頁縮窄後的樣子；App 視窗（popup）中是否退回新分頁 | 設定頁選「分割畫面」後逐一點卡片 |
 | Claude 改為不還原後：鎖定→解鎖點卡片會開登入頁（一般分頁） | 鎖定→解鎖點卡片 |
 | 官方 PWA（Spotify、YouTube）還原後是否登入 | 開 PWA 確認 |
 | 捷徑釘選到工作列後，入口頁 App 視窗是否獨立一顆、顯示 PersonaHub 圖示 | 釘選後觀察 |
