@@ -348,33 +348,19 @@ async function openService({ id, panel }, sender) {
 async function openFromPanel(svc, url, needsLogin) {
   const win = await chrome.windows.getLastFocused({ windowTypes: ['normal'], populate: true });
   const existing = win.tabs.find((t) => serviceForUrl(t.url || t.pendingUrl || '') === svc);
-  let tabId;
   if (existing) {
-    tabId = existing.id;
-    await chrome.tabs.update(tabId, needsLogin ? { active: true, url } : { active: true });
+    await chrome.tabs.update(existing.id, needsLogin ? { active: true, url } : { active: true });
   } else {
     const active = win.tabs.find((t) => t.active);
     if (active && /^chrome:\/\/(newtab|new-tab-page)\//.test(active.url || active.pendingUrl || '')) {
-      tabId = active.id;
-      await chrome.tabs.update(tabId, { url });
+      await chrome.tabs.update(active.id, { url });
     } else {
-      tabId = (await chrome.tabs.create({ windowId: win.id, url, active: true })).id;
+      await chrome.tabs.create({ windowId: win.id, url, active: true });
     }
   }
-  await groupIntoHub(win.id, tabId).catch((e) => console.warn('分頁群組失敗', e));
   return { panel: true };
 }
 
-// 服務分頁收進該視窗名為 PersonaHub 的分頁群組(沒有就建立),沿用 D-0003 的群組樣式
-async function groupIntoHub(windowId, tabId) {
-  const [group] = await chrome.tabGroups.query({ windowId, title: 'PersonaHub' });
-  if (group) {
-    await chrome.tabs.group({ tabIds: [tabId], groupId: group.id });
-  } else {
-    const groupId = await chrome.tabs.group({ tabIds: [tabId], createProperties: { windowId } });
-    await chrome.tabGroups.update(groupId, { title: 'PersonaHub', color: 'blue' });
-  }
-}
 
 // [實驗] 分割畫面(Chrome 155+):入口頁在左,服務分頁在右。
 // 入口頁已在分割中就把右邊換成這個服務;API 不存在或視窗不支援(例如 popup)就退回新分頁。
