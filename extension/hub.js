@@ -218,7 +218,10 @@ $('#btn-settings').addEventListener('click', () => {
   show(current);
   say('');
 });
-$('#btn-settings-close').addEventListener('click', () => refresh());
+$('#btn-settings-close').addEventListener('click', () => {
+  current = 'hub';
+  refresh();
+});
 
 $('#view-settings').addEventListener('submit', (e) => {
   e.preventDefault();
