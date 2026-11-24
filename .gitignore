@@ -20,3 +20,6 @@ desktop.ini
 # 記錄與暫存
 *.log
 tmp/
+
+# Chrome 主題快取（載入 theme/ 時產生）
+*.pak
