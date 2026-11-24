@@ -31,6 +31,7 @@
 - Commit message 用 Conventional Commits，說明為什麼。
 - 只 `git add` 自己改的檔案。行尾一律 LF。
 - 需要 GitHub 授權（push 失敗、gh 未登入）時，提醒使用者處理，不自己繞過。
+- 改到 `background.js`、`crypto.js`、`manifest.json`，或 Vault、金鑰、訊息處理相關程式時，commit 前先派 `rules-security-reviewer` 審查（D-0008）。
 
 ## 3. 機密
 
@@ -41,6 +42,7 @@
 
 - 不說「應該可以」。階段用詞：`已實作` / `已 commit` / `已 push` / `已驗收`。
 - 分開列**已驗證**與**尚未驗證**。外掛的實際行為（cookie 還原、各服務登入）只能在使用者的真實 Chrome 驗證，Claude 的內建瀏覽器無法載入外掛。
+- 同一個問題修正兩次仍失敗：停下，把現況與試過的做法寫進 `docs/STATUS.md`，給使用者開場白並開新對話（D-0008）。
 - 回報結尾：**改了什麼**、**驗證到哪**、**等使用者做什麼**。
 
 ## 5. 溝通

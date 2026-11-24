@@ -21,6 +21,7 @@
 | 規則 | 為什麼 | 來源 |
 |---|---|---|
 | 檢查指令：每個 `.js` 跑 `node --input-type=module --check`；`manifest.json` 要能 JSON 解析 | 沒有建置流程，語法錯誤只能這樣提早抓 | D-0001 |
+| Claude 編輯後由 `.claude/hooks/check-on-edit.mjs` 自動跑上一條檢查；改檢查方式時兩處一起改 | 編輯當下就抓語法錯誤 | D-0008 |
 | 外掛行為在真實 Chrome 驗證 | Claude 的內建瀏覽器無法載入外掛 | D-0001 |
 
 ## 3. 踩過的坑
